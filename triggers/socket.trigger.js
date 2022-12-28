@@ -4,8 +4,8 @@ module.exports = function (servers) {
 
   const io = new Server(servers, {
     cors: {
-      // origin: "https://cp-chat-app.netlify.app",
-      origin: "http://localhost:3000",
+      origin: "https://cp-chat-app.netlify.app",
+      // origin: "http://localhost:3000",
       method: ["GET", "POST"]
     }
   })

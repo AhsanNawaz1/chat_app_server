@@ -140,7 +140,6 @@ router.get("/conversationLists", AUTHENTICATE, async (req, res) => {
       //   })
       // }
 
-      res.status(201).json(UsersInConversation)
     }
   }
   catch (err) {

@@ -75,59 +75,72 @@ router.get("/conversationLists", AUTHENTICATE, async (req, res) => {
 
       let UsersInConversation = [];
 
+
       if (!getCoversations.length) {
-        res.status(201).json([])
+        res.status(201).json(users)
       }
 
 
       if (getCoversations.length) {
         getCoversations.map((i) => {
           let temp = i.members.filter((x) => x != user_id);
-
           let obj = {
-            user_id: temp[0],
+            _id: temp[0],
             conversationId: i._id
           }
-
           UsersInConversation.push(obj)
         })
+
+
+        UsersInConversation.forEach((x, inx) => {
+          let temp = users.filter((z) => !(z._id.equals(x._id)) && !(z._id.equals(user_id)));
+          UsersInConversation.push(temp[0])
+
+          let temp1 = users.filter((z) => (z._id.equals(x._id)) && !(z._id.equals(user_id)));
+
+          if (x._id.equals(temp1[0]._id)) {
+            UsersInConversation[inx]['imgUrl'] = temp1[0].imgUrl
+            UsersInConversation[inx]['name'] = temp1[0].name
+          }
+        })
+        res.status(201).json(UsersInConversation)
       }
 
       let allUsers = [];
 
-      if (UsersInConversation.length) {
-        users.forEach((i) => {
-          let temp = UsersInConversation.filter((x) => x.user_id.equals(i._id))
+      // if (UsersInConversation.length) {
+      //   users.forEach((i) => {
+      //     let temp = UsersInConversation.filter((x) => x.user_id.equals(i._id))
 
-          if (temp.length) {
-            let user = {
-              _id: i._id,
-              imgUrl: i.imgUrl,
-              conversationId: temp[0].conversationId,
-              name: i.name
-            }
+      //     if (temp.length) {
+      //       let user = {
+      //         _id: i._id,
+      //         imgUrl: i.imgUrl,
+      //         conversationId: temp[0].conversationId,
+      //         name: i.name
+      //       }
 
-            allUsers.push(user)
-          }
-        })
-      }
+      //       allUsers.push(user)
+      //     }
+      //   })
+      // }
 
-      let allConversations = []
+      // let allConversations = []
 
-      if (allUsers.length) {
-        allUsers.forEach(async (i) => {
-          const allMsgs = await Message.find({ conversationId: i.conversationId });
+      // if (allUsers.length) {
+      //   allUsers.forEach(async (i) => {
+      //     const allMsgs = await Message.find({ conversationId: i.conversationId });
 
-          let obj = {
-            ...i,
-            lastMsg: allMsgs[allMsgs.length - 1].text
-          }
+      //     let obj = {
+      //       ...i,
+      //       lastMsg: allMsgs[allMsgs.length - 1].text
+      //     }
 
-          console.log("Obj===>", obj)
-        })
-      }
+      //     console.log("Obj===>", obj)
+      //   })
+      // }
 
-      res.status(201).json(allUsers)
+      res.status(201).json(UsersInConversation)
     }
   }
   catch (err) {
@@ -154,7 +167,10 @@ router.post("/createMessage", AUTHENTICATE, async (req, res) => {
 
 router.get("/conversation/:id", AUTHENTICATE, async (req, res) => {
   try {
-    const getConversation = await Message.find({ conversationId: req.params.id })
+    const getConversation = await Message.find({ conversationId: req.params.id });
+    // const findById = await Message.find({ _id: "63ac2b92c0723e8519a7ea2d" });
+
+    console.log("getConversation", getConversation)
     res.status(201).json(getConversation);
   }
   catch (err) {
